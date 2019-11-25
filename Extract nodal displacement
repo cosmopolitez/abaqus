@@ -1,29 +1,27 @@
-#!/user/bin/python
-# -*- coding:UTF-8 -*-
 from visualization import *
 from odbAccess import *
 from abaqusConstants import *
 import string
 import xlwt
 odb = openOdb(path = 'Job1.odb')
-wbkName = 'RF2Exaction'                         #命名表格文件名
-wbk = xlwt.Workbook()                           #创建新的表格
-sheet = wbk.add_sheet('sheet1')                 #创建sheet1
+wbkName = 'RF2Exaction'                         #name the excel file
+wbk = xlwt.Workbook()                           #create new workbook
+sheet = wbk.add_sheet('sheet1')                 #create sheet1
 myAssembly = odb.rootAssembly                   
 frameRepository = odb.steps['Step-1'].frames
 RefPointSet = myAssembly.nodeSets['Master Node 5']
 for i in range(len(frameRepository)):
-    #提取参考点RF1在y方向的支反力
+    #extract reaction force of reference point
     RForce = frameRepository[i].fieldOutputs['RF']
     RefPointRForce = RForce.getSubset(region = RefPointSet)
     RForceValues = RefPointRForce.values
     RF_2 = RForceValues[0].data[2]
-    #提取参考点RF1的位移量
+    #displacement of reference point
     displacement =frameRepository[i].fieldOutputs['U']
     RefPointDisp = displacement.getSubset(region = RefPointSet)
     DispValue = RefPointDisp.values
     Disp = DispValue[0].data[2]
-    #将结果写入相应的行和列
+    #write the results
     sheet.write(i,0,round(Disp,3))
     sheet.write(i,1,round(RF_2,2))
 wbk.save('wbkName.xls')
